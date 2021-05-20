@@ -18,6 +18,7 @@ class GildedRoseTest extends TestCase
             new Item("+5 Dexterity Vest", $sellIn, 20),
             new Item("Aged Brie", $sellIn, 20),
             new Item("Backstage passes to a TAFKAL80ETC concert", $sellIn, 20),
+            new Item("Conjured Mana Cake", $sellIn, 20),
         ];
         $gildedRose = new GildedRose($items);
 
@@ -202,6 +203,50 @@ class GildedRoseTest extends TestCase
         $items = [
             new Item('Backstage passes to a TAFKAL80ETC concert', -5, 20),
             ];
+        $gildedRose = new GildedRose($items);
+        $gildedRose->updateQuality();
+
+        $this->assertEquals(0, $items[0]->quality);
+    }
+
+    public function testConjuredItemBeforeSellByDate(): void
+    {
+        $items = [
+            new Item("Conjured Mana Cake", 10, 20),
+        ];
+        $gildedRose = new GildedRose($items);
+        $gildedRose->updateQuality();
+
+        $this->assertEquals(18, $items[0]->quality);
+    }
+
+    public function testConjuredItemOnSellByDate(): void
+    {
+        $items = [
+            new Item("Conjured Mana Cake", 0, 20),
+        ];
+        $gildedRose = new GildedRose($items);
+        $gildedRose->updateQuality();
+
+        $this->assertEquals(16, $items[0]->quality);
+    }
+
+    public function testConjuredItemAfterSellByDate(): void
+    {
+        $items = [
+            new Item("Conjured Mana Cake", -5, 20),
+        ];
+        $gildedRose = new GildedRose($items);
+        $gildedRose->updateQuality();
+
+        $this->assertEquals(16, $items[0]->quality);
+    }
+
+    public function testConjuredItemQualityNeverBelow0(): void
+    {
+        $items = [
+            new Item("Conjured Mana Cake", -5, 0),
+        ];
         $gildedRose = new GildedRose($items);
         $gildedRose->updateQuality();
 
