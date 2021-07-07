@@ -6,12 +6,17 @@ namespace GildedRose;
 
 final class GildedRose
 {
-    const NAME_BRIE = 'Aged Brie';
-    const NAME_SULFURAS = 'Sulfuras, Hand of Ragnaros';
-    const NAME_TICKET = 'Backstage passes to a TAFKAL80ETC concert';
-    const NAME_CAKE = 'Conjured Mana Cake';
-    const MIN_QUALITY =  0;
-    const MAX_QUALITY = 50;
+    public const NAME_BRIE = 'Aged Brie';
+
+    public const NAME_SULFURAS = 'Sulfuras';
+
+    public const NAME_TICKET = 'Backstage passes';
+
+    public const NAME_CAKE = 'Conjured';
+
+    public const MIN_QUALITY = 0;
+
+    public const MAX_QUALITY = 50;
 
     /**
      * @var Item[]
@@ -25,25 +30,25 @@ final class GildedRose
 
     public function updateQuality(): void
     {
+
+        $agedBrieHandler = new ItemBrieHandler();
+
         foreach ($this->items as $item) {
-
-            switch ($item->name) {
-                case self::NAME_SULFURAS:
-
-                    break;
-                case self::NAME_BRIE:
-                    $this->updateSellIn($item);
-                    $this->updateQualityBrie($item);
-                    $this->normalizeItemQuality($item);
+            switch (true) {
+                case stripos($item->name, self::NAME_SULFURAS) !== false:
 
                     break;
-                case self::NAME_TICKET:
+                case $agedBrieHandler->supports($item) !== false:
+                    $agedBrieHandler->updateQuality($item);
+
+                    break;
+                case stripos($item->name, self::NAME_TICKET) !== false:
                     $this->updateSellIn($item);
                     $this->updateQualityTicket($item);
                     $this->normalizeItemQuality($item);
 
                     break;
-                case self::NAME_CAKE:
+                case stripos($item->name, self::NAME_CAKE) !== false:
                     $this->updateSellIn($item);
                     $this->updateQualityCake($item);
                     $this->normalizeItemQuality($item);
@@ -55,14 +60,15 @@ final class GildedRose
                     $this->normalizeItemQuality($item);
 
             }
+
         }
     }
 
     private function updateQualityBrie(Item $item): void
     {
-        $item->quality += 1;
+        ++$item->quality;
         if ($item->sell_in < 0) {
-            $item->quality += 1;
+            ++$item->quality;
         }
     }
 
@@ -75,7 +81,7 @@ final class GildedRose
         } elseif ($item->sell_in < 10) {
             $item->quality += 2;
         } else {
-            $item->quality += 1;
+            ++$item->quality;
         }
     }
 
@@ -89,15 +95,15 @@ final class GildedRose
 
     private function updateQualityDefault(Item $item): void
     {
-        $item->quality -= 1;
+        --$item->quality;
         if ($item->sell_in < 0) {
-            $item->quality -= 1;
+            --$item->quality;
         }
     }
 
     private function updateSellIn(Item $item): void
     {
-        $item->sell_in -= 1;
+        --$item->sell_in;
     }
 
     private function normalizeItemQuality(Item $item): void
